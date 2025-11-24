@@ -1,0 +1,95 @@
+import sys
+from typing import Dict, Optional, Tuple, Any
+
+EXCHANGE_RATES: Dict[str, float] = {
+    "USD": 1.0,
+    "EUR": 0.93,
+    "GBP": 0.81,
+    "JPY": 156.41,
+    "CAD": 1.37,
+    "AUD": 1.51,
+    "INR": 83.47,
+    "CNY": 7.24,
+}
+
+def get_available_currencies() -> str:
+    return ", ".join(EXCHANGE_RATES.keys())
+
+def convert_currency(amount: float, from_currency: str, to_currency: str) -> Optional[Tuple[float, float]]:
+    from_currency = from_currency.upper()
+    to_currency = to_currency.upper()
+
+    if from_currency not in EXCHANGE_RATES or to_currency not in EXCHANGE_RATES:
+        return None 
+
+    try:
+        rate_from_base = EXCHANGE_RATES[from_currency]
+
+        rate_to_base = EXCHANGE_RATES[to_currency]
+
+        direct_rate = rate_to_base / rate_from_base
+
+        converted_amount = amount * direct_rate
+
+        return converted_amount, direct_rate
+
+    except Exception as e:
+        print(f"An unexpected error occurred during conversion: {e}")
+        return None
+
+def main():
+    
+    print("-" * 50)
+    print(" 💵 Python Command-Line Currency Converter 💵 ")
+    print("-" * 50)
+    print(f"Supported Currencies: {get_available_currencies()}")
+    print("Type 'exit' or 'quit' to close the program.\n")
+
+    while True:
+        try:
+            amount_input = input("Enter amount to convert (e.g., 100.00): ").strip()
+            if amount_input.lower() in ['exit', 'quit']:
+                break
+            
+            amount = float(amount_input)
+            if amount <= 0:
+                print("Amount must be a positive number.")
+                continue
+
+            from_currency = input("Convert FROM currency code (e.g., USD): ").strip().upper()
+            if from_currency.lower() in ['exit', 'quit']:
+                break
+                
+            if from_currency not in EXCHANGE_RATES:
+                print(f"Error: Currency '{from_currency}' not supported.")
+                continue
+
+            to_currency = input("Convert TO currency code (e.g., EUR): ").strip().upper()
+            if to_currency.lower() in ['exit', 'quit']:
+                break
+                
+            if to_currency not in EXCHANGE_RATES:
+                print(f"Error: Currency '{to_currency}' not supported.")
+                continue
+
+            result = convert_currency(amount, from_currency, to_currency)
+
+            if result:
+                converted_amount, rate = result
+                print("\n" + "=" * 50)
+                print(f"Conversion Rate: 1 {from_currency} = {rate:.4f} {to_currency}")
+                print(f"Result: {amount:,.2f} {from_currency} = {converted_amount:,.2f} {to_currency}")
+                print("=" * 50 + "\n")
+            else:
+                print("\nError: Conversion failed. Check currency codes.")
+
+        except ValueError:
+            print("\nInvalid input. Please enter a valid number for the amount.\n")
+        except Exception as e:
+            print(f"\nAn unexpected error occurred: {e}\n")
+
+    print("Thank you for using the Currency Converter!")
+    sys.exit(0)
+
+if __name__ == "__main__":
+    main()
